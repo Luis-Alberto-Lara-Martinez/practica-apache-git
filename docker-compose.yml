@@ -1,0 +1,42 @@
+# Define la versión del formato de Docker Compose que se usará.
+version: '3.8'
+
+# Inicia la sección donde se declaran los servicios (contenedores).
+services:
+  # Nombre lógico del servicio principal con Apache.
+  servidor-web:
+    # Indica que la imagen se construye usando el Dockerfile del directorio actual.
+    build: .
+    # Asigna un nombre fijo al contenedor creado para este servicio.
+    container_name: apache-container
+    # Inicia la sección de mapeo de puertos entre host y contenedor.
+    ports:
+      # Expone el puerto 80 del contenedor en el puerto 8081 del ordenador.
+      - "8081:80"
+    # Inicia la sección de redes a las que se conectará el servicio.
+    networks:
+      # Conecta este servicio a la red interna definida más abajo.
+      - red-interna
+    # Inicia la sección de volúmenes (montajes de carpetas para persistir datos).
+    volumes:
+      # Monta la carpeta actual del proyecto dentro de la carpeta web de Apache.
+      - .:/usr/local/apache2/htdocs/
+  # Nombre lógico del servicio auxiliar para pruebas en terminal.
+  terminal-test:
+    # Usa la imagen oficial mínima de Alpine Linux.
+    image: alpine
+    # Asigna un nombre fijo al contenedor de prueba.
+    container_name: terminal-test
+    # Mantiene una terminal interactiva activa en el contenedor.
+    tty: true
+    # Inicia la sección de redes para este servicio.
+    networks:
+      # Conecta también este servicio a la misma red interna.
+      - red-interna
+
+# Inicia la definición de redes personalizadas del proyecto.
+networks:
+  # Nombre de la red interna que compartirán los servicios.
+  red-interna:
+    # Define que la red será de tipo bridge (red local entre contenedores).
+    driver: bridge
